@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ISO Équip.">
+<title>ISO Équipements</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent:  #1a3a6b;
+    --accent2: #142d56;
+    --red:     #d42b2b;
+    --green:   #1aa060;
+    --orange:  #e07a10;
+    --bg:      #f2f3f5;
+    --card:    #ffffff;
+    --border:  #e0e3e8;
+    --text:    #1a1d24;
+    --text2:   #4a5068;
+    --muted:   #9098b0;
+    --tabbar:  #ffffff;
+    --shadow:  0 1px 6px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.05);
+    --fh: 'Montserrat', sans-serif;
+    --fb: 'Open Sans', sans-serif;
+
+    /* iPhone safe areas */
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--fb);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── APP SHELL ─── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: var(--sat);
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+
+  /* ─── HEADER ─── */
+  .app-header {
+    background: var(--accent);
+    padding: 14px 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,.2);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--fh);
+    font-weight: 900; font-size: 11px;
+    color: #fff;
+    letter-spacing: .5px;
+  }
+  .logo-text {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 17px;
+    color: #fff;
+    letter-spacing: .3px;
+  }
+  .logo-text span { opacity: .7; }
+  .header-time {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    font-weight: 500;
+  }
+
+  /* ─── SCREENS ─── */
+  .screens {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: none;
+    padding: 16px 14px;
+  }
+  .screen.active { display: block; }
+
+  /* ─── TAB BAR ─── */
+  .tab-bar {
+    background: var(--tabbar);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding-bottom: calc(var(--sab) + 4px);
+    padding-top: 6px;
+    flex-shrink: 0;
+  }
+  .tab-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 0 4px;
+    transition: opacity .15s;
+  }
+  .tab-icon { font-size: 22px; line-height: 1; }
+  .tab-label {
+    font-family: var(--fh);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .tab-btn.active .tab-label { color: var(--accent); }
+  .tab-btn.active .tab-icon { filter: drop-shadow(0 0 4px rgba(26,58,107,.3)); }
+
+  /* ─── FORM SCREEN ─── */
+  .section-title {
+    font-family: var(--fh);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+
+  /* TYPE PILLS */
+  .type-pills {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .pill {
+    padding: 12px 6px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pill-icon { font-size: 20px; }
+  .pill-label {
+    font-family: var(--fh);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .pill.active[data-type="C"] { border-color: var(--accent); background: rgba(26,58,107,.06); }
+  .pill.active[data-type="C"] .pill-label { color: var(--accent); }
+  .pill.active[data-type="D"] { border-color: var(--red); background: rgba(212,43,43,.06); }
+  .pill.active[data-type="D"] .pill-label { color: var(--red); }
+  .pill.active[data-type="I"] { border-color: var(--orange); background: rgba(224,122,16,.06); }
+  .pill.active[data-type="I"] .pill-label { color: var(--orange); }
+
+  /* FIELDS */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .field input, .field textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--text);
+    font-family: var(--fb);
+    font-size: 16px; /* 16px pour éviter le zoom iOS */
+    font-weight: 400;
+    outline: none;
+    transition: border-color .2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); }
+  .field input[type="text"] { text-transform: uppercase; }
+  .field textarea { resize: none; height: 90px; line-height: 1.5; font-size: 15px; text-transform: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: var(--fh);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: all .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-submit:active { opacity: .8; transform: scale(.98); }
+
+  /* ─── LIST SCREEN ─── */
+  .list-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .list-heading {
+    font-family: var(--fh);
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    flex: 1;
+  }
+  .count-pill {
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .search-input {
+    width: 100%;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: var(--text);
+    font-family: var(--fb);
+    outline: none;
+    margin-bottom: 10px;
+    -webkit-appearance: none;
+  }
+  .search-input:focus { border-color: var(--accent); }
+
+  .filters {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin-bottom: 14px;
+    padding-bottom: 2px;
+  }
+  .filters::-webkit-scrollbar { display: none; }
+  .f-btn {
+    white-space: nowrap;
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    font-family: var(--fh);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all .15s;
+  }
+  .f-btn.active { border-color: var(--accent); background: rgba(26,58,107,.08); color: var(--accent); }
+
+  /* ─── ENTRY CARD ─── */
+  .entry-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    animation: slideIn .2s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .entry-card.done { opacity: .45; }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .type-badge {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--fh);
+    font-weight: 900;
+    font-size: 10px;
+    letter-spacing: .5px;
+  }
+  .type-C { background: rgba(26,58,107,.1); color: var(--accent); border: 1.5px solid rgba(26,58,107,.2); }
+  .type-D { background: rgba(212,43,43,.1); color: var(--red); border: 1.5px solid rgba(212,43,43,.2); }
+  .type-I { background: rgba(224,122,16,.1); color: var(--orange); border: 1.5px solid rgba(224,122,16,.2); }
+
+  .card-info { flex: 1; min-width: 0; }
+  .card-client {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 3px;
+    flex-wrap: wrap;
+  }
+  .card-immat {
+    background: rgba(26,58,107,.07);
+    border: 1px solid rgba(26,58,107,.15);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    font-family: var(--fh);
+  }
+  .card-model {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex-shrink: 0;
+  }
+  .act-btn {
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: all .15s;
+  }
+  .act-btn.ok-checked { border-color: var(--green); background: rgba(26,160,96,.1); }
+  .act-btn:active { transform: scale(.9); }
+
+  .card-besoins {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+  .card-time {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .3px;
+  }
+
+  /* ─── STATS SCREEN ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+  .stat-card.wide { grid-column: 1 / -1; }
+  .stat-lbl {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .stat-val {
+    font-family: var(--fh);
+    font-size: 38px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .c-total  { color: var(--text); }
+  .c-devis  { color: var(--accent); }
+  .c-cmd    { color: var(--red); }
+  .c-info   { color: var(--orange); }
+  .c-ok     { color: var(--green); }
+
+  .export-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    color: var(--accent);
+    font-family: var(--fh);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 6px;
+    box-shadow: var(--shadow);
+    transition: all .15s;
+  }
+  .export-btn:active { opacity: .8; }
+  .danger-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--card);
+    border: 1.5px solid rgba(212,43,43,.3);
+    border-radius: 12px;
+    color: var(--red);
+    font-family: var(--fh);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: var(--shadow);
+    transition: all .15s;
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: calc(var(--sab) + 80px);
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 20px;
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all .3s ease;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 500;
+    align-items: flex-end;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--bg);
+    border-radius: 20px 20px 0 0;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(var(--sab) + 16px);
+    animation: sheetUp .25s ease;
+  }
+  @keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 12px auto 0;
+  }
+  .modal-header {
+    padding: 16px 18px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-title {
+    font-family: var(--fh);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .modal-close {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--border);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text2);
+  }
+  .modal-body { padding: 16px 18px; }
+
+  .btn-save {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: var(--fh);
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .btn-save:active { opacity: .8; }
+
+  /* edit type pills inside modal */
+  .edit-pills {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 44px; margin-bottom: 10px; }
+  .empty-text { font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="app-header">
+    <div class="logo">
+      <div class="logo-icon">ISO</div>
+      <div class="logo-text">ISO <span>ÉQUIPEMENTS</span></div>
+    </div>
+    <div class="header-time" id="headerTime"></div>
+  </div>
+
+  <!-- SCREENS -->
+  <div class="screens">
+
+    <!-- ── SCREEN 1 : NOUVELLE DEMANDE ── -->
+    <div class="screen active" id="screen-form">
+      <div class="section-title">Type de demande</div>
+      <div class="type-pills">
+        <div class="pill active" data-type="C" onclick="selectType('C')">
+          <span class="pill-icon">📋</span>
+          <span class="pill-label">Devis</span>
+        </div>
+        <div class="pill" data-type="D" onclick="selectType('D')">
+          <span class="pill-icon">🛒</span>
+          <span class="pill-label">Commande</span>
+        </div>
+        <div class="pill" data-type="I" onclick="selectType('I')">
+          <span class="pill-icon">💬</span>
+          <span class="pill-label">Infos</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Client / Garage</label>
+        <input type="text" id="client" placeholder="NOM CLIENT" autocomplete="off" autocorrect="off" autocapitalize="characters">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Immat. / VIN</label>
+          <input type="text" id="immat" placeholder="AB-123-CD" autocorrect="off" autocapitalize="characters">
+        </div>
+        <div class="field">
+          <label>Modèle</label>
+          <input type="text" id="modele" placeholder="208 / GOLF" autocorrect="off" autocapitalize="characters">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Besoins / Pièces demandées</label>
+        <textarea id="besoins" placeholder="Ex : FILTRE HUILE + COURROIE DISTRIB..."></textarea>
+      </div>
+
+      <button class="btn-submit" onclick="addEntry()">＋ ENREGISTRER</button>
+    </div>
+
+    <!-- ── SCREEN 2 : LISTE ── -->
+    <div class="screen" id="screen-list">
+      <div class="list-toolbar">
+        <span class="list-heading">Demandes</span>
+        <span class="count-pill" id="countPill">0</span>
+      </div>
+
+      <input class="search-input" id="searchBar" placeholder="🔍 Client, immat, pièce..." oninput="renderList()">
+
+      <div class="filters">
+        <button class="f-btn active" data-filter="all" onclick="setFilter('all')">Toutes</button>
+        <button class="f-btn" data-filter="C" onclick="setFilter('C')">Devis</button>
+        <button class="f-btn" data-filter="D" onclick="setFilter('D')">Commandes</button>
+        <button class="f-btn" data-filter="I" onclick="setFilter('I')">Infos</button>
+        <button class="f-btn" data-filter="pending" onclick="setFilter('pending')">En attente</button>
+      </div>
+
+      <div id="entryList"></div>
+    </div>
+
+    <!-- ── SCREEN 3 : STATS ── -->
+    <div class="screen" id="screen-stats">
+      <div class="section-title">Aujourd'hui</div>
+      <div class="stats-grid">
+        <div class="stat-card wide">
+          <div class="stat-lbl">Total demandes</div>
+          <div class="stat-val c-total" id="statTotal">0</div>
+          <div class="stat-sub" id="statDate">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Devis</div>
+          <div class="stat-val c-devis" id="statC">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Commandes</div>
+          <div class="stat-val c-cmd" id="statD">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Infos</div>
+          <div class="stat-val c-info" id="statI">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Traitées ✓</div>
+          <div class="stat-val c-ok" id="statOK">0</div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:8px">Données</div>
+      <button class="export-btn" onclick="exportData()">📤 EXPORTER LES DONNÉES</button>
+      <button class="danger-btn" onclick="clearToday()">🗑️ EFFACER AUJOURD'HUI</button>
+    </div>
+
+  </div><!-- /screens -->
+
+  <!-- TAB BAR -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="form" onclick="switchTab('form')">
+      <span class="tab-icon">✏️</span>
+      <span class="tab-label">Saisie</span>
+    </button>
+    <button class="tab-btn" data-tab="list" onclick="switchTab('list')">
+      <span class="tab-icon">📋</span>
+      <span class="tab-label">Demandes</span>
+    </button>
+    <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">
+      <span class="tab-icon">📊</span>
+      <span class="tab-label">Stats</span>
+    </button>
+  </div>
+
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- EDIT MODAL (bottom sheet) -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="modal-title">✏️ Modifier la demande</span>
+      <button class="modal-close" onclick="closeEdit()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId">
+
+      <div class="section-title">Type</div>
+      <div class="edit-pills">
+        <div class="pill active" data-edit-type="C" onclick="selectEditType('C')">
+          <span class="pill-icon">📋</span>
+          <span class="pill-label">Devis</span>
+        </div>
+        <div class="pill" data-edit-type="D" onclick="selectEditType('D')">
+          <span class="pill-icon">🛒</span>
+          <span class="pill-label">Commande</span>
+        </div>
+        <div class="pill" data-edit-type="I" onclick="selectEditType('I')">
+          <span class="pill-icon">💬</span>
+          <span class="pill-label">Infos</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Client / Garage</label>
+        <input type="text" id="editClient" placeholder="NOM CLIENT" autocorrect="off" autocapitalize="characters">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Immat. / VIN</label>
+          <input type="text" id="editImmat" placeholder="AB-123-CD" autocorrect="off" autocapitalize="characters">
+        </div>
+        <div class="field">
+          <label>Modèle</label>
+          <input type="text" id="editModele" placeholder="208 / GOLF" autocorrect="off" autocapitalize="characters">
+        </div>
+      </div>
+      <div class="field">
+        <label>Besoins / Pièces</label>
+        <textarea id="editBesoins" placeholder="Ex : FILTRE HUILE..."></textarea>
+      </div>
+      <button class="btn-save" onclick="saveEdit()">💾 ENREGISTRER</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ── SUPABASE ──
+  const SUPA_URL = 'https://ixsqbajqigvpbdljkizv.supabase.co';
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4c3FiYWpxaWd2cGJkbGpraXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzI0MTksImV4cCI6MjA5MzEwODQxOX0.972sl2jovCceFUNRLmrC-O53nT49qEW-A_xEM-1Pfs8';
+  const supa     = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  let entries   = [];
+  let curType   = 'C';
+  let curFilter = 'all';
+  let editType  = 'C';
+  let curTab    = 'form';
+
+  async function init() {
+    updateTime();
+    await loadFromSupabase();
+    subscribeRealtime();
+    setInterval(updateTime, 30000);
+  }
+
+  function updateTime() {
+    const now = new Date();
+    const el = document.getElementById('headerTime');
+    if (el) el.textContent = now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    const d = document.getElementById('statDate');
+    if (d) d.textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+  }
+
+  async function loadFromSupabase() {
+    const el = document.getElementById('headerTime');
+    if (el) el.textContent = '⟳';
+    const { data, error } = await supa.from('demandes').select('*').order('id', { ascending: false });
+    if (error) { if (el) el.textContent = '⚠️'; return; }
+    entries = data || [];
+    updateTime();
+    renderList();
+    updateStats();
+  }
+
+  function subscribeRealtime() {
+    supa.channel('demandes-mobile')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'demandes' }, () => {
+        loadFromSupabase();
+      })
+      .subscribe();
+  }
+
+  function switchTab(tab) {
+    curTab = tab;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('screen-' + tab).classList.add('active');
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+    if (tab === 'list') renderList();
+    if (tab === 'stats') updateStats();
+  }
+
+  function selectType(t) {
+    curType = t;
+    document.querySelectorAll('.pill[data-type]').forEach(p =>
+      p.classList.toggle('active', p.dataset.type === t));
+  }
+
+  async function addEntry() {
+    const client  = document.getElementById('client').value.trim();
+    const immat   = document.getElementById('immat').value.trim();
+    const modele  = document.getElementById('modele').value.trim();
+    const besoins = document.getElementById('besoins').value.trim();
+    if (!client && !besoins) { showToast('⚠️ Client ou besoins requis'); return; }
+    const { error } = await supa.from('demandes').insert({
+      id: Date.now(), type: curType, client: client || '—',
+      immat, modele, besoins, ok: false,
+      heure: new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }),
+      date: new Date().toLocaleDateString('fr-FR')
+    });
+    if (error) { showToast('⚠️ Erreur réseau'); return; }
+    ['client','immat','modele','besoins'].forEach(id => document.getElementById(id).value = '');
+    showToast('✅ Demande enregistrée !');
+  }
+
+  async function toggleOK(id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    await supa.from('demandes').update({ ok: !e.ok }).eq('id', id);
+  }
+
+  async function deleteEntry(id) {
+    if (!confirm('Supprimer cette demande ?')) return;
+    await supa.from('demandes').delete().eq('id', id);
+    showToast('🗑️ Supprimée');
+  }
+
+  function openEdit(id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('editId').value = id;
+    document.getElementById('editClient').value = e.client === '—' ? '' : e.client;
+    document.getElementById('editImmat').value = e.immat;
+    document.getElementById('editModele').value = e.modele;
+    document.getElementById('editBesoins').value = e.besoins;
+    editType = e.type;
+    document.querySelectorAll('[data-edit-type]').forEach(p =>
+      p.classList.toggle('active', p.dataset.editType === editType));
+    document.getElementById('editModal').classList.add('open');
+  }
+  function closeEdit() { document.getElementById('editModal').classList.remove('open'); }
+  function selectEditType(t) {
+    editType = t;
+    document.querySelectorAll('[data-edit-type]').forEach(p =>
+      p.classList.toggle('active', p.dataset.editType === t));
+  }
+  async function saveEdit() {
+    const id = parseInt(document.getElementById('editId').value);
+    await supa.from('demandes').update({
+      type: editType,
+      client: document.getElementById('editClient').value.trim() || '—',
+      immat: document.getElementById('editImmat').value.trim(),
+      modele: document.getElementById('editModele').value.trim(),
+      besoins: document.getElementById('editBesoins').value.trim()
+    }).eq('id', id);
+    closeEdit();
+    showToast('✏️ Modifiée !');
+  }
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEdit();
+  });
+
+  function setFilter(f) {
+    curFilter = f;
+    document.querySelectorAll('.f-btn').forEach(b =>
+      b.classList.toggle('active', b.dataset.filter === f));
+    renderList();
+  }
+
+  function renderList() {
+    const search = (document.getElementById('searchBar')?.value || '').toLowerCase();
+    const typeLabel = { C:'DEV', D:'CMD', I:'INFO' };
+    const filtered = entries.filter(e => {
+      if (curFilter !== 'all' && curFilter !== 'pending' && e.type !== curFilter) return false;
+      if (curFilter === 'pending' && e.ok) return false;
+      if (search) {
+        const hay = [e.client, e.immat, e.modele, e.besoins].join(' ').toLowerCase();
+        if (!hay.includes(search)) return false;
+      }
+      return true;
+    });
+    const pill = document.getElementById('countPill');
+    if (pill) pill.textContent = filtered.length;
+    const list = document.getElementById('entryList');
+    if (!list) return;
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Aucune demande trouvée</div></div>`;
+      return;
+    }
+    list.innerHTML = filtered.map(e => `
+      <div class="entry-card ${e.ok ? 'done' : ''}">
+        <div class="card-top">
+          <div class="type-badge type-${e.type}">${typeLabel[e.type] || e.type}</div>
+          <div class="card-info">
+            <div class="card-client">${e.client}</div>
+            <div class="card-meta">
+              ${e.immat ? `<span class="card-immat">${e.immat}</span>` : ''}
+              ${e.modele ? `<span class="card-model">${e.modele}</span>` : ''}
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="act-btn ${e.ok ? 'ok-checked' : ''}" onclick="toggleOK(${e.id})">${e.ok ? '✅' : '⬜'}</button>
+            <button class="act-btn" onclick="openEdit(${e.id})">✏️</button>
+            <button class="act-btn" onclick="deleteEntry(${e.id})">🗑️</button>
+          </div>
+        </div>
+        ${e.besoins ? `<div class="card-besoins">${e.besoins}</div>` : ''}
+        <div class="card-time">🕐 ${e.heure} · ${e.date}</div>
+      </div>
+    `).join('');
+  }
+
+  function updateStats() {
+    const today = new Date().toLocaleDateString('fr-FR');
+    const td = entries.filter(e => e.date === today);
+    document.getElementById('statTotal').textContent = td.length;
+    document.getElementById('statC').textContent = td.filter(e => e.type === 'C').length;
+    document.getElementById('statD').textContent = td.filter(e => e.type === 'D').length;
+    document.getElementById('statI').textContent = td.filter(e => e.type === 'I').length;
+    document.getElementById('statOK').textContent = td.filter(e => e.ok).length;
+  }
+
+  async function exportData() {
+    const today = new Date().toLocaleDateString('fr-FR');
+    const td = entries.filter(e => e.date === today);
+    if (!td.length) { showToast("Aucune donnée aujourd'hui"); return; }
+    const label = { C:'DEVIS', D:'COMMANDE', I:'INFOS' };
+    const lines = [`ISO ÉQUIPEMENTS — Export ${today}\n`];
+    td.forEach((e, i) => {
+      lines.push(`[${i+1}] ${label[e.type]} — ${e.heure}`);
+      lines.push(`Client : ${e.client}`);
+      if (e.immat)   lines.push(`Immat  : ${e.immat}`);
+      if (e.modele)  lines.push(`Modèle : ${e.modele}`);
+      if (e.besoins) lines.push(`Besoins: ${e.besoins}`);
+      lines.push(`Statut : ${e.ok ? '✅ Traitée' : '⏳ En attente'}`);
+      lines.push('');
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `iso-demandes-${today.replace(/\//g,'-')}.txt`;
+    a.click();
+    showToast('📤 Export OK !');
+  }
+
+  async function clearToday() {
+    const today = new Date().toLocaleDateString('fr-FR');
+    const count = entries.filter(e => e.date === today).length;
+    if (!count) { showToast('Rien à effacer'); return; }
+    if (!confirm(`Effacer les ${count} demande(s) d'aujourd'hui ?`)) return;
+    await supa.from('demandes').delete().eq('date', today);
+    showToast("🗑️ Aujourd'hui effacé");
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  init();
+</script>
+</body>
+</html>
