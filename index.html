@@ -608,7 +608,10 @@
       <div class="logo-icon">ISO</div>
       <div class="logo-text">ISO <span>ÉQUIPEMENTS</span></div>
     </div>
-    <div class="header-time" id="headerTime"></div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button onclick="refreshNow()" style="background:rgba(255,255,255,.15);border:none;border-radius:8px;width:34px;height:34px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;" title="Actualiser">🔄</button>
+      <div class="header-time" id="headerTime"></div>
+    </div>
   </div>
 
   <!-- SCREENS -->
@@ -781,12 +784,45 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-  // ── SUPABASE ──
+  // ── SUPABASE SANS SDK (fetch natif) ──
   const SUPA_URL = 'https://ixsqbajqigvpbdljkizv.supabase.co';
   const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4c3FiYWpxaWd2cGJkbGpraXp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc1MzI0MTksImV4cCI6MjA5MzEwODQxOX0.972sl2jovCceFUNRLmrC-O53nT49qEW-A_xEM-1Pfs8';
-  const supa     = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+  const headers = {
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+
+  const db = {
+    async select() {
+      const r = await fetch(`${SUPA_URL}/rest/v1/demandes?select=*&order=id.desc`, { headers });
+      return r.ok ? await r.json() : [];
+    },
+    async insert(row) {
+      await fetch(`${SUPA_URL}/rest/v1/demandes`, {
+        method: 'POST', headers, body: JSON.stringify(row)
+      });
+    },
+    async update(id, data) {
+      await fetch(`${SUPA_URL}/rest/v1/demandes?id=eq.${id}`, {
+        method: 'PATCH', headers, body: JSON.stringify(data)
+      });
+    },
+    async delete(id) {
+      await fetch(`${SUPA_URL}/rest/v1/demandes?id=eq.${id}`, {
+        method: 'DELETE', headers
+      });
+    },
+    async deleteByDate(date) {
+      await fetch(`${SUPA_URL}/rest/v1/demandes?date=eq.${encodeURIComponent(date)}`, {
+        method: 'DELETE', headers
+      });
+    }
+  };
 
   let entries   = [];
   let curType   = 'C';
@@ -809,26 +845,33 @@
     if (d) d.textContent = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
   }
 
-  async function loadFromSupabase() {
-    const el = document.getElementById('headerTime');
-    if (el) el.textContent = '⟳';
-    const { data, error } = await supa.from('demandes').select('*').order('id', { ascending: false });
-    if (error) { if (el) el.textContent = '⚠️'; return; }
-    entries = data || [];
-    updateTime();
+  async function loadFromSupabase(silent) {
+    if (!silent) {
+      const el = document.getElementById('headerTime');
+      if (el) el.textContent = '⟳';
+    }
+    const data = await db.select();
+    if (!data || (!data.length && data.length !== 0)) return;
+    entries = data;
+    if (!silent) updateTime();
     renderList();
     updateStats();
   }
 
   function subscribeRealtime() {
-    supa.channel('demandes-mobile')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'demandes' }, () => {
-        loadFromSupabase();
-      })
-      .subscribe();
+    // Rafraîchit les données toutes les 30s
+    setInterval(() => loadFromSupabase(true), 30000);
+    // Recharge la page entière toutes les 30 minutes
+    setInterval(() => location.reload(), 30 * 60 * 1000);
   }
 
-  function switchTab(tab) {
+  async function refreshNow() {
+    const btn = document.querySelector('[onclick="refreshNow()"]');
+    if (btn) btn.style.opacity = '.4';
+    await loadFromSupabase();
+    if (btn) btn.style.opacity = '1';
+    showToast('🔄 Actualisé !');
+  }
     curTab = tab;
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -850,27 +893,39 @@
     const modele  = document.getElementById('modele').value.trim();
     const besoins = document.getElementById('besoins').value.trim();
     if (!client && !besoins) { showToast('⚠️ Client ou besoins requis'); return; }
-    const { error } = await supa.from('demandes').insert({
+    const newEntry = {
       id: Date.now(), type: curType, client: client || '—',
       immat, modele, besoins, ok: false,
       heure: new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' }),
       date: new Date().toLocaleDateString('fr-FR')
-    });
-    if (error) { showToast('⚠️ Erreur réseau'); return; }
+    };
+    // Mise à jour locale immédiate
+    entries.unshift(newEntry);
+    renderList(); updateStats();
     ['client','immat','modele','besoins'].forEach(id => document.getElementById(id).value = '');
     showToast('✅ Demande enregistrée !');
+    // Synchro en arrière-plan
+    db.insert(newEntry);
   }
 
-  async function toggleOK(id) {
+  function toggleOK(id) {
     const e = entries.find(x => x.id === id);
     if (!e) return;
-    await supa.from('demandes').update({ ok: !e.ok }).eq('id', id);
+    // Mise à jour locale immédiate
+    e.ok = !e.ok;
+    renderList(); updateStats();
+    // Synchro en arrière-plan
+    db.update(id, { ok: e.ok });
   }
 
   async function deleteEntry(id) {
     if (!confirm('Supprimer cette demande ?')) return;
-    await supa.from('demandes').delete().eq('id', id);
+    // Mise à jour locale immédiate
+    entries = entries.filter(x => x.id !== id);
+    renderList(); updateStats();
     showToast('🗑️ Supprimée');
+    // Synchro en arrière-plan
+    db.delete(id);
   }
 
   function openEdit(id) {
@@ -894,15 +949,22 @@
   }
   async function saveEdit() {
     const id = parseInt(document.getElementById('editId').value);
-    await supa.from('demandes').update({
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    const updates = {
       type: editType,
       client: document.getElementById('editClient').value.trim() || '—',
       immat: document.getElementById('editImmat').value.trim(),
       modele: document.getElementById('editModele').value.trim(),
       besoins: document.getElementById('editBesoins').value.trim()
-    }).eq('id', id);
+    };
+    // Mise à jour locale immédiate
+    Object.assign(e, updates);
     closeEdit();
+    renderList(); updateStats();
     showToast('✏️ Modifiée !');
+    // Synchro en arrière-plan
+    db.update(id, updates);
   }
   document.getElementById('editModal').addEventListener('click', function(e) {
     if (e.target === this) closeEdit();
@@ -996,7 +1058,7 @@
     const count = entries.filter(e => e.date === today).length;
     if (!count) { showToast('Rien à effacer'); return; }
     if (!confirm(`Effacer les ${count} demande(s) d'aujourd'hui ?`)) return;
-    await supa.from('demandes').delete().eq('date', today);
+    await db.deleteByDate(today);
     showToast("🗑️ Aujourd'hui effacé");
   }
 
