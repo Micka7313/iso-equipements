@@ -872,7 +872,8 @@
     if (btn) btn.style.opacity = '1';
     showToast('🔄 Actualisé !');
   }
-    curTab = tab;
+
+  function switchTab(tab) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('screen-' + tab).classList.add('active');
