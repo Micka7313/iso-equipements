@@ -12,13 +12,16 @@ class VanheckService {
   // ── OAuth2 token management ──────────────────────────────────────────────
 
   async _fetchToken() {
-    const { VANHECK_TOKEN_URL, VANHECK_CLIENT_ID, VANHECK_CLIENT_SECRET } = process.env;
+    const { VANHECK_TOKEN_URL, VANHECK_CLIENT_ID, VANHECK_CLIENT_SECRET, VANHECK_SCOPE } = process.env;
 
-    const body = new URLSearchParams({
+    const params = {
       grant_type: 'client_credentials',
       client_id: VANHECK_CLIENT_ID,
       client_secret: VANHECK_CLIENT_SECRET,
-    }).toString();
+    };
+    if (VANHECK_SCOPE) params.scope = VANHECK_SCOPE;
+
+    const body = new URLSearchParams(params).toString();
 
     const url = new URL(VANHECK_TOKEN_URL);
     const options = {
