@@ -67,10 +67,9 @@ class VanheckService {
 
   // ── API call ─────────────────────────────────────────────────────────────
 
-  async _get(path) {
+  async _get(urlString) {
     const token = await this._getValidToken();
-    const baseUrl = new URL(process.env.VANHECK_CATALOGUE_URL);
-    const fullUrl = new URL(path, baseUrl);
+    const fullUrl = new URL(urlString);
 
     const options = {
       hostname: fullUrl.hostname,
