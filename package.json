@@ -1,0 +1,12 @@
+{
+  "name": "iso-equipements",
+  "version": "1.0.0",
+  "description": "ISO Equipements project",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {
+    "claude-flow": "github:ruvnet/ruflo#3.6.12"
+  }
+}
