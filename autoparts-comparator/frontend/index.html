@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AutoParts Comparator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <span class="logo">&#9881; AutoParts Comparator</span>
+      <span class="tagline">Comparez vos fournisseurs en temps réel</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="search-box">
+      <form id="searchForm">
+        <input
+          id="refInput"
+          type="text"
+          placeholder="Référence constructeur (ex: 1K0615301N)"
+          autocomplete="off"
+          autocapitalize="characters"
+          spellcheck="false"
+          required
+        />
+        <button type="submit" id="searchBtn">Rechercher</button>
+      </form>
+    </section>
+
+    <section id="statusBar" class="status-bar hidden"></section>
+
+    <section id="resultsSection" class="hidden">
+      <div class="results-header">
+        <h2>Résultats pour <span id="refLabel"></span></h2>
+        <span id="rowCount" class="badge"></span>
+      </div>
+
+      <div class="table-wrapper">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>Fournisseur</th>
+              <th>Marque</th>
+              <th>Prix HT</th>
+              <th>Disponibilité</th>
+              <th>Délai livraison</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+
+      <div id="errorsSection" class="hidden">
+        <h3>Erreurs fournisseurs</h3>
+        <ul id="errorsList"></ul>
+      </div>
+    </section>
+
+    <section id="emptyState" class="empty-state hidden">
+      <p>Aucun résultat trouvé pour cette référence.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
