@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bricolage">
+<title>Notes Bricolage</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent:   #1a3a6b;
+    --accent-l: rgba(26,58,107,.08);
+    --red:      #d42b2b;
+    --red-l:    rgba(212,43,43,.08);
+    --orange:   #d97706;
+    --orange-l: rgba(217,119,6,.08);
+    --green:    #16a34a;
+    --green-l:  rgba(22,163,74,.08);
+    --bg:       #f2f3f5;
+    --card:     #ffffff;
+    --border:   #e0e3e8;
+    --text:     #1a1d24;
+    --text2:    #4a5068;
+    --muted:    #9098b0;
+    --tabbar:   #ffffff;
+    --shadow:   0 1px 4px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.04);
+    --fh: 'Montserrat', sans-serif;
+    --fb: 'Open Sans', sans-serif;
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box; margin: 0; padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--fb);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* ── SHELL ── */
+  #app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: var(--sat);
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--accent);
+    padding: 14px 18px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .header-left { display: flex; align-items: center; gap: 11px; }
+  .header-icon {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.18);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .header-title {
+    font-family: var(--fh);
+    font-weight: 800;
+    font-size: 17px;
+    color: #fff;
+    letter-spacing: .2px;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: rgba(255,255,255,.6);
+    margin-top: 1px;
+    font-weight: 500;
+  }
+  .header-time {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    font-weight: 600;
+    font-family: var(--fh);
+  }
+
+  /* ── FILTER TABS ── */
+  .filter-bar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .filter-tab {
+    flex: 1;
+    padding: 11px 4px;
+    border: none;
+    background: transparent;
+    font-family: var(--fh);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2.5px solid transparent;
+    transition: all .15s;
+  }
+  .filter-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ── SCROLL AREA ── */
+  .list-wrap {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px 14px 0;
+  }
+
+  /* ── TASK CARD ── */
+  .task-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 13px 13px 13px 14px;
+    margin-bottom: 9px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    animation: fadeUp .2s ease;
+    transition: opacity .2s;
+  }
+  .task-card.done { opacity: .4; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(-5px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .check-btn {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    transition: all .15s;
+    margin-top: 1px;
+  }
+  .check-btn.checked {
+    border-color: var(--green);
+    background: var(--green-l);
+    color: var(--green);
+  }
+  .check-btn:active { transform: scale(.88); }
+
+  .task-body { flex: 1; min-width: 0; }
+  .task-text {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.45;
+    word-break: break-word;
+  }
+  .task-card.done .task-text {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .task-footer {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 7px;
+    flex-wrap: wrap;
+  }
+  .prio-badge {
+    font-family: var(--fh);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 20px;
+  }
+  .prio-urgent  { background: var(--red-l);    color: var(--red);    border: 1px solid rgba(212,43,43,.2); }
+  .prio-normal  { background: var(--accent-l); color: var(--accent); border: 1px solid rgba(26,58,107,.15); }
+  .prio-idee    { background: var(--orange-l); color: var(--orange); border: 1px solid rgba(217,119,6,.2); }
+
+  .task-time {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: .2px;
+  }
+
+  .del-btn {
+    flex-shrink: 0;
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    color: var(--muted);
+    transition: all .15s;
+    margin-top: 0;
+    align-self: center;
+  }
+  .del-btn:active { border-color: var(--red); color: var(--red); transform: scale(.9); }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-family: var(--fh);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 4px 0 8px 2px;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 64px 24px;
+    color: var(--muted);
+  }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; line-height: 1; }
+  .empty-title {
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .empty-hint { font-size: 13px; }
+
+  /* ── INPUT ZONE ── */
+  .input-zone {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 14px calc(var(--sab) + 12px);
+    flex-shrink: 0;
+  }
+
+  .prio-row {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 10px;
+  }
+  .prio-btn {
+    flex: 1;
+    padding: 9px 4px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--bg);
+    font-family: var(--fh);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: all .15s;
+  }
+  .prio-btn.sel-urgent  { border-color: var(--red);    background: var(--red-l);    color: var(--red); }
+  .prio-btn.sel-normal  { border-color: var(--accent);  background: var(--accent-l); color: var(--accent); }
+  .prio-btn.sel-idee    { border-color: var(--orange);  background: var(--orange-l); color: var(--orange); }
+
+  .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+  }
+  .task-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 16px;
+    font-family: var(--fb);
+    color: var(--text);
+    outline: none;
+    resize: none;
+    line-height: 1.4;
+    max-height: 100px;
+    overflow-y: auto;
+    -webkit-appearance: none;
+    transition: border-color .2s;
+  }
+  .task-input:focus { border-color: var(--accent); background: var(--card); }
+  .task-input::placeholder { color: var(--muted); }
+
+  .add-btn {
+    flex-shrink: 0;
+    width: 48px; height: 48px;
+    background: var(--accent);
+    border: none;
+    border-radius: 13px;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+    font-weight: 300;
+  }
+  .add-btn:active { transform: scale(.92); opacity: .85; }
+
+  /* ── CLEAR DONE LINK ── */
+  .clear-done {
+    text-align: center;
+    padding: 6px 0 14px;
+  }
+  .clear-done button {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--fh);
+    font-weight: 700;
+    letter-spacing: .5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    padding: 4px 10px;
+  }
+  .clear-done button:active { color: var(--red); }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: calc(var(--sab) + 90px);
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: var(--text);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-family: var(--fh);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: all .25s ease;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">🔧</div>
+      <div>
+        <div class="header-title">Bricolage</div>
+        <div class="header-sub" id="pendingCount">Chargement…</div>
+      </div>
+    </div>
+    <div class="header-time" id="headerTime"></div>
+  </div>
+
+  <!-- FILTER TABS -->
+  <div class="filter-bar">
+    <button class="filter-tab active" data-f="all"     onclick="setFilter('all')">Toutes</button>
+    <button class="filter-tab"        data-f="todo"    onclick="setFilter('todo')">À faire</button>
+    <button class="filter-tab"        data-f="urgent"  onclick="setFilter('urgent')">Urgent</button>
+    <button class="filter-tab"        data-f="done"    onclick="setFilter('done')">Terminées</button>
+  </div>
+
+  <!-- TASK LIST -->
+  <div class="list-wrap" id="listWrap"></div>
+
+  <!-- INPUT -->
+  <div class="input-zone">
+    <div class="prio-row">
+      <button class="prio-btn sel-normal" data-p="normal" onclick="setPrio('normal')">📌 Normal</button>
+      <button class="prio-btn"            data-p="urgent" onclick="setPrio('urgent')">🔴 Urgent</button>
+      <button class="prio-btn"            data-p="idee"   onclick="setPrio('idee')">💡 Idée</button>
+    </div>
+    <div class="input-row">
+      <textarea class="task-input" id="taskInput" rows="1"
+        placeholder="Ajouter une tâche…"
+        oninput="autoResize(this)"
+        onkeydown="handleKey(event)"></textarea>
+      <button class="add-btn" onclick="addTask()">＋</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const STORE_KEY = 'bricolage_tasks_v1';
+  let tasks = [];
+  let curFilter = 'all';
+  let curPrio = 'normal';
+
+  function load() {
+    try { tasks = JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
+    catch { tasks = []; }
+  }
+  function save() {
+    localStorage.setItem(STORE_KEY, JSON.stringify(tasks));
+  }
+
+  function setPrio(p) {
+    curPrio = p;
+    document.querySelectorAll('.prio-btn').forEach(b => {
+      b.className = 'prio-btn';
+      if (b.dataset.p === p) b.classList.add(`sel-${p}`);
+    });
+  }
+
+  function setFilter(f) {
+    curFilter = f;
+    document.querySelectorAll('.filter-tab').forEach(b =>
+      b.classList.toggle('active', b.dataset.f === f));
+    render();
+  }
+
+  function addTask() {
+    const input = document.getElementById('taskInput');
+    const text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    const task = {
+      id: Date.now(),
+      text,
+      prio: curPrio,
+      done: false,
+      at: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+      day: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+    };
+    tasks.unshift(task);
+    save();
+    input.value = '';
+    input.style.height = '';
+    render();
+    showToast('✅ Tâche ajoutée');
+    if (curFilter === 'done') setFilter('all');
+  }
+
+  function toggleDone(id) {
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    t.done = !t.done;
+    if (t.done) t.doneAt = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    save();
+    render();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(x => x.id !== id);
+    save();
+    render();
+    showToast('🗑️ Supprimée');
+  }
+
+  function clearDone() {
+    const count = tasks.filter(x => x.done).length;
+    if (!count) return;
+    tasks = tasks.filter(x => !x.done);
+    save();
+    render();
+    showToast(`🗑️ ${count} terminée(s) effacée(s)`);
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      addTask();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = '';
+    el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+  }
+
+  const prioLabel = { urgent: 'Urgent', normal: 'Normal', idee: 'Idée' };
+  const prioIcon  = { urgent: '🔴', normal: '📌', idee: '💡' };
+
+  function render() {
+    const filtered = tasks.filter(t => {
+      if (curFilter === 'todo')   return !t.done;
+      if (curFilter === 'done')   return t.done;
+      if (curFilter === 'urgent') return t.prio === 'urgent' && !t.done;
+      return true;
+    });
+
+    const pending = tasks.filter(t => !t.done).length;
+    document.getElementById('pendingCount').textContent =
+      pending === 0 ? 'Tout est fait ✓' :
+      pending === 1 ? '1 tâche en attente' : `${pending} tâches en attente`;
+
+    const wrap = document.getElementById('listWrap');
+
+    if (filtered.length === 0) {
+      const msgs = {
+        all:    { icon: '🔧', title: 'Aucune tâche',       hint: 'Notez votre prochaine tâche ci-dessous.' },
+        todo:   { icon: '✅', title: 'Tout est fait !',    hint: 'Bravo, la liste est vide.' },
+        done:   { icon: '📋', title: 'Rien de terminé',   hint: 'Complétez vos tâches pour les voir ici.' },
+        urgent: { icon: '🟢', title: 'Aucun urgent',       hint: 'Pas de tâche urgente en cours.' },
+      };
+      const m = msgs[curFilter];
+      wrap.innerHTML = `<div class="empty">
+        <div class="empty-icon">${m.icon}</div>
+        <div class="empty-title">${m.title}</div>
+        <div class="empty-hint">${m.hint}</div>
+      </div>`;
+      return;
+    }
+
+    const hasDone = filtered.some(t => t.done);
+    const hasTodo = filtered.some(t => !t.done);
+
+    let html = '';
+
+    if (curFilter === 'all' && hasTodo) {
+      html += `<div class="section-label">À faire</div>`;
+      filtered.filter(t => !t.done).forEach(t => { html += cardHTML(t); });
+    }
+
+    if (curFilter !== 'all') {
+      filtered.forEach(t => { html += cardHTML(t); });
+    }
+
+    if (curFilter === 'all' && hasDone) {
+      html += `<div class="section-label" style="margin-top:${hasTodo?'16px':'4px'}">Terminées</div>`;
+      filtered.filter(t => t.done).forEach(t => { html += cardHTML(t); });
+    }
+
+    if (hasDone) {
+      html += `<div class="clear-done"><button onclick="clearDone()">Effacer les terminées</button></div>`;
+    } else {
+      html += `<div style="height:14px"></div>`;
+    }
+
+    wrap.innerHTML = html;
+  }
+
+  function cardHTML(t) {
+    const prioClass = `prio-${t.prio}`;
+    const when = t.done && t.doneAt ? `Terminée à ${t.doneAt}` : `${t.day} · ${t.at}`;
+    return `
+      <div class="task-card ${t.done ? 'done' : ''}">
+        <button class="check-btn ${t.done ? 'checked' : ''}" onclick="toggleDone(${t.id})">
+          ${t.done ? '✓' : ''}
+        </button>
+        <div class="task-body">
+          <div class="task-text">${escHtml(t.text)}</div>
+          <div class="task-footer">
+            <span class="prio-badge ${prioClass}">${prioIcon[t.prio]} ${prioLabel[t.prio]}</span>
+            <span class="task-time">${when}</span>
+          </div>
+        </div>
+        <button class="del-btn" onclick="deleteTask(${t.id})">✕</button>
+      </div>`;
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._tid);
+    t._tid = setTimeout(() => t.classList.remove('show'), 2200);
+  }
+
+  function updateTime() {
+    const el = document.getElementById('headerTime');
+    if (el) el.textContent = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  load();
+  render();
+  updateTime();
+  setInterval(updateTime, 30000);
+</script>
+</body>
+</html>
